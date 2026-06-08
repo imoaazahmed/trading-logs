@@ -118,6 +118,84 @@ create index trades_entry_date_idx on public.trades (entry_date desc);
 
 ---
 
+## patches
+
+One row per batch of ~100 trades per user. Tab label = `patch_number × 100 + " Trades"`.
+
+```sql
+create table public.patches (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  patch_number int not null,
+  created_at timestamptz default now() not null,
+  unique (user_id, patch_number)
+);
+
+alter table public.patches enable row level security;
+
+create policy "Users can view their own patches"
+  on public.patches for select using (auth.uid() = user_id);
+
+create policy "Users can insert their own patches"
+  on public.patches for insert with check (auth.uid() = user_id);
+
+create policy "Users can delete their own patches"
+  on public.patches for delete using (auth.uid() = user_id);
+
+create index patches_user_id_idx on public.patches (user_id);
+```
+
+---
+
+## trades (redesign — run AFTER dropping old table)
+
+> **Warning:** This drops the existing `trades` table. The old schema was a placeholder with no real data. Run on dev first.
+
+```sql
+drop table if exists public.trades cascade;
+
+create table public.trades (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  patch_id uuid references public.patches(id) on delete cascade not null,
+  trade_number int not null,
+  trade_date date not null,
+  trade_time time not null,
+  coin text not null,
+  direction text check (direction in ('long', 'short')) not null,
+  order_type text check (order_type in ('market', 'limit')) not null,
+  avg_entry numeric(20, 8) not null,
+  stop_loss numeric(20, 8) not null,
+  avg_exit numeric(20, 8) not null,
+  risk numeric(12, 2) not null,
+  rules_followed boolean not null,
+  setup_type text not null,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null,
+  unique (patch_id, trade_number)
+);
+
+alter table public.trades enable row level security;
+
+create policy "Users can view their own trades"
+  on public.trades for select using (auth.uid() = user_id);
+
+create policy "Users can insert their own trades"
+  on public.trades for insert with check (auth.uid() = user_id);
+
+create policy "Users can update their own trades"
+  on public.trades for update using (auth.uid() = user_id);
+
+create policy "Users can delete their own trades"
+  on public.trades for delete using (auth.uid() = user_id);
+
+create index trades_user_id_idx on public.trades (user_id);
+create index trades_patch_id_idx on public.trades (patch_id);
+create index trades_patch_trade_number_idx on public.trades (patch_id, trade_number);
+```
+
+---
+
 ## Checklist Before Running on Production
 
 - [ ] Run `profiles` table + trigger first
