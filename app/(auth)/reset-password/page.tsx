@@ -6,8 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { resetPassword } from "@/lib/auth/actions"
 import { resetPasswordSchema, type ResetPasswordFormValues } from "@/lib/schemas/auth"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { PasswordInput } from "@/components/ui/password-input"
 import {
   Card,
   CardContent,
@@ -48,9 +48,8 @@ export default function ResetPasswordPage() {
           )}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="password">{t("auth.resetPassword.newPassword")}</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               {...register("password")}
             />
@@ -59,10 +58,9 @@ export default function ResetPasswordPage() {
             )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="confirm">{t("auth.resetPassword.confirmPassword")}</Label>
-            <Input
+            <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
+            <PasswordInput
               id="confirm"
-              type="password"
               autoComplete="new-password"
               {...register("confirm")}
             />

@@ -23,6 +23,9 @@
     "email": "البريد الإلكتروني",
     "emailPlaceholder": "example@email.com",
     "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
     "login": {
       "title": "مرحباً بعودتك",
       "description": "سجّل دخولك إلى حسابك",
@@ -53,10 +56,14 @@
       "title": "تعيين كلمة مرور جديدة",
       "description": "اختر كلمة مرور جديدة لحسابك",
       "newPassword": "كلمة المرور الجديدة",
-      "confirmPassword": "تأكيد كلمة المرور",
       "submit": "تحديث كلمة المرور",
       "submitting": "جارٍ التحديث…"
     }
+  },
+  "passwordStrength": {
+    "weak": "ضعيفة",
+    "fair": "متوسطة",
+    "strong": "قوية"
   },
   "validation": {
     "email": {

@@ -20,6 +20,10 @@ export const signupSchema = yup.object({
     .string()
     .min(6, "validation.password.minLength")
     .required("validation.password.required"),
+  confirm: yup
+    .string()
+    .oneOf([yup.ref("password")], "validation.confirmPassword.mismatch")
+    .required("validation.confirmPassword.required"),
 })
 
 export const forgotPasswordSchema = yup.object({
