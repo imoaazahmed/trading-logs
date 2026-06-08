@@ -17,7 +17,8 @@ import {
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const side = i18n.dir() === "rtl" ? "right" : "left"
 
   const links = [
     { href: "/overview", label: t("sidebar.overview"), icon: LayoutDashboard },
@@ -25,7 +26,7 @@ export function AppSidebar() {
   ]
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side={side}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>

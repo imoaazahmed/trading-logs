@@ -10,7 +10,7 @@ export function Navbar({ user }: { user: User }) {
   const { t } = useTranslation()
 
   return (
-    <header className="flex h-14 shrink-0 items-center border-b px-4 gap-2">
+    <header className="flex h-14 shrink-0 items-center border-b bg-background px-4 gap-2">
       <Link
         href="/overview"
         className="me-auto font-heading text-sm font-semibold tracking-tight"

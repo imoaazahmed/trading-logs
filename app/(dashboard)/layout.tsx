@@ -25,7 +25,7 @@ export default async function DashboardLayout({
       <Navbar user={user} />
       <div className="flex flex-1 min-h-0">
         <AppSidebar />
-        <SidebarInset className="overflow-auto">
+        <SidebarInset className="overflow-auto bg-muted">
           {children}
         </SidebarInset>
       </div>
