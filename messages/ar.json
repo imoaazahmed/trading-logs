@@ -74,7 +74,78 @@
   },
   "errors": {
     "rateLimitExceeded": "محاولات كثيرة جداً. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.",
-    "authCallbackFailed": "رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب رابط جديد."
+    "authCallbackFailed": "رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب رابط جديد.",
+    "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "unauthorized": "يجب تسجيل الدخول للقيام بذلك."
+  },
+  "trades": {
+    "title": "التداولات",
+    "addTrade": "إضافة تداول",
+    "editTrade": "تعديل التداول",
+    "deleteTrade": "حذف التداول",
+    "deleteConfirmTitle": "حذف التداول #{{number}}؟",
+    "deleteConfirmDescription": "لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "تأكيد",
+    "cancel": "إلغاء",
+    "tradeCount": "{{count}} / 100 تداول",
+    "newPatch": "دفعة جديدة",
+    "patchLabel": "{{count}} تداول",
+    "emptyState": "لا توجد تداولات بعد. انقر على \"إضافة تداول\" لتسجيل أول تداول.",
+    "tabSuffix": "تداول",
+    "columns": {
+      "number": "#",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "coin": "العملة",
+      "direction": "الاتجاه",
+      "orderType": "نوع الأمر",
+      "avgEntry": "متوسط الدخول",
+      "stopLoss": "وقف الخسارة",
+      "avgExit": "متوسط الخروج",
+      "risk": "المخاطرة",
+      "realisedLoss": "الخسارة المحققة",
+      "realisedWin": "الربح المحقق",
+      "deviation": "الانحراف",
+      "rMultiple": "R+/-",
+      "riskVolatility": "تقلب المخاطرة",
+      "cumulativePnl": "الربح/الخسارة التراكمي $",
+      "cumulativeR": "R التراكمي",
+      "rulesFollowed": "القواعد؟",
+      "setupType": "نوع الإعداد",
+      "actions": "إجراءات"
+    },
+    "form": {
+      "date": "التاريخ",
+      "time": "الوقت",
+      "coin": "العملة",
+      "coinPlaceholder": "مثال: BTC",
+      "direction": "الاتجاه",
+      "directionLong": "شراء",
+      "directionShort": "بيع",
+      "orderType": "نوع الأمر",
+      "orderTypeMarket": "سوق",
+      "orderTypeLimit": "محدد",
+      "avgEntry": "متوسط الدخول",
+      "stopLoss": "وقف الخسارة",
+      "avgExit": "متوسط الخروج",
+      "risk": "المخاطرة ($)",
+      "rulesFollowed": "القواعد؟",
+      "rulesYes": "نعم",
+      "rulesNo": "لا",
+      "setupType": "نوع الإعداد",
+      "setupTypePlaceholder": "مثال: SFP، اتجاه السوق",
+      "preview": "معاينة محسوبة",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…"
+    },
+    "direction": {
+      "long": "شراء",
+      "short": "بيع"
+    },
+    "orderType": {
+      "market": "سوق",
+      "limit": "محدد"
+    }
   },
   "footer": {
     "copyright": "© {{year}} Trading Logs. جميع الحقوق محفوظة.",
@@ -98,6 +169,24 @@
     "confirmPassword": {
       "required": "يرجى تأكيد كلمة المرور",
       "mismatch": "كلمتا المرور غير متطابقتين"
+    },
+    "trades": {
+      "coinRequired": "العملة مطلوبة",
+      "avgEntryRequired": "متوسط الدخول مطلوب",
+      "avgEntryPositive": "يجب أن يكون رقماً موجباً",
+      "stopLossRequired": "وقف الخسارة مطلوب",
+      "stopLossPositive": "يجب أن يكون رقماً موجباً",
+      "stopLossLong": "يجب أن يكون وقف الخسارة أقل من متوسط الدخول لصفقة الشراء",
+      "stopLossShort": "يجب أن يكون وقف الخسارة أعلى من متوسط الدخول لصفقة البيع",
+      "avgExitRequired": "متوسط الخروج مطلوب",
+      "avgExitPositive": "يجب أن يكون رقماً موجباً",
+      "riskRequired": "المخاطرة مطلوبة",
+      "riskPositive": "يجب أن يكون رقماً موجباً",
+      "directionRequired": "الاتجاه مطلوب",
+      "orderTypeRequired": "نوع الأمر مطلوب",
+      "setupTypeRequired": "نوع الإعداد مطلوب",
+      "dateRequired": "التاريخ مطلوب",
+      "timeRequired": "الوقت مطلوب"
     }
   }
 }

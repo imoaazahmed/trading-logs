@@ -74,7 +74,78 @@
   },
   "errors": {
     "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again.",
-    "authCallbackFailed": "The password reset link is invalid or has expired. Please request a new one."
+    "authCallbackFailed": "The password reset link is invalid or has expired. Please request a new one.",
+    "generic": "Something went wrong. Please try again.",
+    "unauthorized": "You must be signed in to do that."
+  },
+  "trades": {
+    "title": "Trades",
+    "addTrade": "Add Trade",
+    "editTrade": "Edit Trade",
+    "deleteTrade": "Delete Trade",
+    "deleteConfirmTitle": "Delete trade #{{number}}?",
+    "deleteConfirmDescription": "This action cannot be undone.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "tradeCount": "{{count}} / 100 trades",
+    "newPatch": "New patch",
+    "patchLabel": "{{count}} Trades",
+    "emptyState": "No trades yet. Click \"Add Trade\" to log your first trade.",
+    "tabSuffix": "Trades",
+    "columns": {
+      "number": "#",
+      "date": "Date",
+      "time": "Time",
+      "coin": "Coin",
+      "direction": "Direction",
+      "orderType": "Order Type",
+      "avgEntry": "Avg Entry",
+      "stopLoss": "Stop Loss",
+      "avgExit": "Avg Exit",
+      "risk": "Risk",
+      "realisedLoss": "Realised Loss",
+      "realisedWin": "Realised Win",
+      "deviation": "Deviation",
+      "rMultiple": "R+/-",
+      "riskVolatility": "Risk Volatility",
+      "cumulativePnl": "Cumulative PnL $",
+      "cumulativeR": "Cumulative R",
+      "rulesFollowed": "Rules?",
+      "setupType": "Setup Type",
+      "actions": "Actions"
+    },
+    "form": {
+      "date": "Date",
+      "time": "Time",
+      "coin": "Coin",
+      "coinPlaceholder": "e.g. BTC",
+      "direction": "Direction",
+      "directionLong": "Long",
+      "directionShort": "Short",
+      "orderType": "Order Type",
+      "orderTypeMarket": "Market",
+      "orderTypeLimit": "Limit",
+      "avgEntry": "Avg Entry",
+      "stopLoss": "Stop Loss",
+      "avgExit": "Avg Exit",
+      "risk": "Risk ($)",
+      "rulesFollowed": "Rules?",
+      "rulesYes": "Yes",
+      "rulesNo": "No",
+      "setupType": "Setup Type",
+      "setupTypePlaceholder": "e.g. SFP, Trend Following",
+      "preview": "Calculated Preview",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "direction": {
+      "long": "Long",
+      "short": "Short"
+    },
+    "orderType": {
+      "market": "Market",
+      "limit": "Limit"
+    }
   },
   "footer": {
     "copyright": "© {{year}} Trading Logs. All rights reserved.",
@@ -98,6 +169,24 @@
     "confirmPassword": {
       "required": "Please confirm your password",
       "mismatch": "Passwords do not match"
+    },
+    "trades": {
+      "coinRequired": "Coin is required",
+      "avgEntryRequired": "Avg entry is required",
+      "avgEntryPositive": "Must be a positive number",
+      "stopLossRequired": "Stop loss is required",
+      "stopLossPositive": "Must be a positive number",
+      "stopLossLong": "Stop loss must be below avg entry for a Long trade",
+      "stopLossShort": "Stop loss must be above avg entry for a Short trade",
+      "avgExitRequired": "Avg exit is required",
+      "avgExitPositive": "Must be a positive number",
+      "riskRequired": "Risk is required",
+      "riskPositive": "Must be a positive number",
+      "directionRequired": "Direction is required",
+      "orderTypeRequired": "Order type is required",
+      "setupTypeRequired": "Setup type is required",
+      "dateRequired": "Date is required",
+      "timeRequired": "Time is required"
     }
   }
 }
