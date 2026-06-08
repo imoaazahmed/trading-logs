@@ -9,6 +9,7 @@
     "trades": "Trades"
   },
   "userMenu": {
+    "accountSettings": "Account settings",
     "settings": "Settings",
     "logout": "Log out"
   },
@@ -41,6 +42,7 @@
       "submit": "Create account",
       "submitting": "Creating account…",
       "successMessage": "Check your email to confirm your account.",
+      "emailTaken": "An account with this email already exists.",
       "hasAccount": "Already have an account?",
       "signinLink": "Sign in"
     },
@@ -59,6 +61,9 @@
       "submit": "Update password",
       "submitting": "Updating…"
     }
+  },
+  "errors": {
+    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again."
   },
   "footer": {
     "copyright": "© {{year}} Trading Logs. All rights reserved.",

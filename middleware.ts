@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/reset-password")
 
   // Redirect unauthenticated users away from protected routes
-  if (!user && !isAuthPage && pathname !== "/") {
+  if (!user && !isAuthPage && pathname !== "/" && !pathname.startsWith("/auth/")) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)

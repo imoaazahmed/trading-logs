@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { I18nProvider } from "@/components/i18n-provider"
 import { DirectionProvider } from "@/components/ui/direction"
 import { cn } from "@/lib/utils"
@@ -54,13 +55,15 @@ export default async function RootLayout({
       <body>
         <DirectionProvider dir={dir}>
           <ThemeProvider>
-            <I18nProvider
-              key={locale}
-              locale={locale}
-              messages={messages[locale]}
-            >
-              {children}
-            </I18nProvider>
+            <TooltipProvider>
+              <I18nProvider
+                key={locale}
+                locale={locale}
+                messages={messages[locale]}
+              >
+                {children}
+              </I18nProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </DirectionProvider>
       </body>

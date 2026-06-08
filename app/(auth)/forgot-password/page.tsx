@@ -26,10 +26,13 @@ export default function ForgotPasswordPage() {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormValues>({ resolver: yupResolver(forgotPasswordSchema) })
 
   async function onSubmit(data: ForgotPasswordFormValues) {
+    clearErrors("root")
+    setSuccessKey(null)
     const result = await forgotPassword(data)
     if (result?.error) {
       setError("root", { message: result.error })

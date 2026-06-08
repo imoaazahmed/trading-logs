@@ -1,13 +1,14 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { resetPassword } from "@/lib/auth/actions"
 import { resetPasswordSchema, type ResetPasswordFormValues } from "@/lib/schemas/auth"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { PasswordInput } from "@/components/ui/password-input"
+import { PasswordStrength } from "@/components/ui/password-strength"
 import {
   Card,
   CardContent,
@@ -23,8 +24,11 @@ export default function ResetPasswordPage() {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormValues>({ resolver: yupResolver(resetPasswordSchema) })
+
+  const password = useWatch({ control, name: "password" }) ?? ""
 
   async function onSubmit(data: ResetPasswordFormValues) {
     const result = await resetPassword({ password: data.password })
@@ -53,8 +57,10 @@ export default function ResetPasswordPage() {
               autoComplete="new-password"
               {...register("password")}
             />
-            {errors.password && (
+            {errors.password ? (
               <p className="text-xs text-destructive">{t(errors.password.message!)}</p>
+            ) : (
+              <PasswordStrength password={password} />
             )}
           </div>
           <div className="flex flex-col gap-1.5">

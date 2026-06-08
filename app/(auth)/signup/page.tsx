@@ -28,6 +28,7 @@ export default function SignupPage() {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     control,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormValues>({ resolver: yupResolver(signupSchema) })
@@ -35,6 +36,8 @@ export default function SignupPage() {
   const password = useWatch({ control, name: "password" }) ?? ""
 
   async function onSubmit(data: SignupFormValues) {
+    clearErrors("root")
+    setSuccessKey(null)
     const result = await signup({ email: data.email, password: data.password })
     if (result?.error) {
       setError("root", { message: result.error })
