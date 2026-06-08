@@ -2,14 +2,17 @@
   "nav": {
     "brand": "Trading Logs",
     "signIn": "Sign in",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "toggleTheme": "Toggle theme",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
   },
   "sidebar": {
     "overview": "Overview",
     "trades": "Trades"
   },
   "userMenu": {
-    "accountSettings": "Account settings",
+    "accountSettings": "Account Settings",
     "settings": "Settings",
     "logout": "Log out"
   },

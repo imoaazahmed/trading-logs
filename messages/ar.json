@@ -2,7 +2,10 @@
   "nav": {
     "brand": "Trading Logs",
     "signIn": "تسجيل الدخول",
-    "getStarted": "ابدأ الآن"
+    "getStarted": "ابدأ الآن",
+    "toggleTheme": "تبديل المظهر",
+    "lightMode": "الوضع الفاتح",
+    "darkMode": "الوضع الداكن"
   },
   "sidebar": {
     "overview": "نظرة عامة",
