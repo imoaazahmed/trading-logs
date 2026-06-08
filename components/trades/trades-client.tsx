@@ -37,7 +37,7 @@ const LAST_PATCH_KEY = 'trading-logs:last-patch'
 function fallbackPatch(list: Patch[], removedId: string): string {
   const removedIndex = list.findIndex((p) => p.id === removedId)
   for (let i = removedIndex - 1; i >= 0; i--) {
-    if (!list[i].is_hidden && list[i].id !== removedId) return list[i].id
+    if (!list[i].is_hidden) return list[i].id
   }
   return list.find((p) => p.id !== removedId && !p.is_hidden)?.id ?? ''
 }
@@ -103,22 +103,18 @@ export function TradesClient({ patches: initialPatches }: Props) {
   async function handleDeletePatch(id: string) {
     const { error } = await deletePatch(id)
     if (!error) {
+      const next = activePatchId === id ? fallbackPatch(patches, id) : null
       setPatches((prev) => prev.filter((p) => p.id !== id))
-      if (activePatchId === id) {
-        const next = fallbackPatch(patches, id)
-        if (next) activatePatch(next)
-      }
+      if (next) activatePatch(next)
     }
   }
 
   async function handleHidePatch(id: string) {
     const { error } = await updatePatch(id, { is_hidden: true })
     if (!error) {
+      const next = activePatchId === id ? fallbackPatch(patches, id) : null
       setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: true } : p)))
-      if (activePatchId === id) {
-        const next = fallbackPatch(patches, id)
-        if (next) activatePatch(next)
-      }
+      if (next) activatePatch(next)
     }
   }
 
