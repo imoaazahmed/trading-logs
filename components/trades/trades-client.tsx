@@ -47,29 +47,43 @@ export function TradesClient({ patches: initialPatches }: Props) {
   const [patches, setPatches] = useState<Patch[]>(initialPatches)
   const [patchId, setPatchId] = useQueryState('patch', { defaultValue: '' })
 
+  // Initialized from localStorage on the client (SSR-safe: returns '' on server).
+  // This makes activePatchId correct on the very first client render without
+  // relying on a useEffect + nuqs URL update, which is unreliable during
+  // Next.js client-side navigation transitions.
+  const [localPatchId, setLocalPatchId] = useState<string>(() => {
+    if (typeof window === 'undefined') return ''
+    try { return localStorage.getItem(LAST_PATCH_KEY) ?? '' } catch { return '' }
+  })
+
   function activatePatch(id: string) {
+    setLocalPatchId(id)
     setPatchId(id)
     localStorage.setItem(LAST_PATCH_KEY, id)
   }
+
   const [rawTrades, setRawTrades] = useState<RawTrade[]>([])
   const [loadingTrades, setLoadingTrades] = useState(false)
   const [drawer, setDrawer] = useState<DrawerState>({ open: false })
   const [deleteTarget, setDeleteTarget] = useState<EnrichedTrade | null>(null)
 
+  // URL param (patchId) takes priority; then localStorage (localPatchId); then last visible.
   const activePatchId =
-    patches.find((p) => p.id === patchId)?.id ??
+    patches.find((p) => p.id === patchId && !p.is_hidden)?.id ??
+    patches.find((p) => p.id === localPatchId && !p.is_hidden)?.id ??
     patches.filter((p) => !p.is_hidden).at(-1)?.id ??
     ''
 
-  // Restore last active patch on mount when URL has no patch param
+  // Sync URL on mount. Deferred to the next macrotask so the Next.js navigation
+  // transition has fully settled before nuqs tries to push a URL update
+  // (calling setPatchId during an active transition gets silently dropped).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (patchId) return
-    const saved = localStorage.getItem(LAST_PATCH_KEY)
-    const target =
-      (saved && patches.find((p) => p.id === saved && !p.is_hidden)?.id) ??
-      patches.filter((p) => !p.is_hidden).at(-1)?.id
-    if (target) activatePatch(target)
+    const target = activePatchId
+    if (!target) return
+    const timer = setTimeout(() => setPatchId(target), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
