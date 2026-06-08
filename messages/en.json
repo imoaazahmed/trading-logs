@@ -60,6 +60,11 @@
       "submitting": "Updating…"
     }
   },
+  "footer": {
+    "copyright": "© {{year}} Trading Logs. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
   "passwordStrength": {
     "weak": "Weak",
     "fair": "Fair",

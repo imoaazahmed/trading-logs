@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { LandingNavbar } from "@/components/layout/landing-navbar"
 import { LandingHero } from "@/components/landing/hero"
+import { LandingFooter } from "@/components/layout/landing-footer"
 
 export default async function RootPage() {
   const supabase = await createClient()
@@ -15,6 +16,7 @@ export default async function RootPage() {
     <div className="flex min-h-svh flex-col">
       <LandingNavbar />
       <LandingHero />
+      <LandingFooter />
     </div>
   )
 }

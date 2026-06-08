@@ -41,7 +41,7 @@ export default function LoginPage() {
         <CardTitle>{t("auth.login.title")}</CardTitle>
         <CardDescription>{t("auth.login.description")}</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="flex flex-col gap-4">
           {errors.root && (
             <p className="text-sm text-destructive">

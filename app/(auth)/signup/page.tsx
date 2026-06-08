@@ -49,7 +49,7 @@ export default function SignupPage() {
         <CardTitle>{t("auth.signup.title")}</CardTitle>
         <CardDescription>{t("auth.signup.description")}</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="flex flex-col gap-4">
           {errors.root && (
             <p className="text-sm text-destructive">

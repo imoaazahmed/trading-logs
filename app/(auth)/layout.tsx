@@ -1,4 +1,5 @@
 import { LandingNavbar } from "@/components/layout/landing-navbar"
+import { LandingFooter } from "@/components/layout/landing-footer"
 
 export default function AuthLayout({
   children,
@@ -11,6 +12,7 @@ export default function AuthLayout({
       <div className="flex flex-1 items-center justify-center p-4">
         {children}
       </div>
+      <LandingFooter />
     </div>
   )
 }

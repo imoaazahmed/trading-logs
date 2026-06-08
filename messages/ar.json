@@ -60,6 +60,11 @@
       "submitting": "جارٍ التحديث…"
     }
   },
+  "footer": {
+    "copyright": "© {{year}} Trading Logs. جميع الحقوق محفوظة.",
+    "privacy": "الخصوصية",
+    "terms": "الشروط"
+  },
   "passwordStrength": {
     "weak": "ضعيفة",
     "fair": "متوسطة",

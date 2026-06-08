@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
         <CardTitle>{t("auth.resetPassword.title")}</CardTitle>
         <CardDescription>{t("auth.resetPassword.description")}</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="flex flex-col gap-4">
           {errors.root && (
             <p className="text-sm text-destructive">
