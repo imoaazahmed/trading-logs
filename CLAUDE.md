@@ -73,6 +73,7 @@ Server actions that return user-facing messages should return a translation key 
 | URL State | nuqs — always use `useQueryState` / `useQueryStates` for URL search params, never roll manual `useSearchParams` + `router.push` |
 | Tables | TanStack Table (`@tanstack/react-table`) — always use for any table UI, no exceptions |
 | Charts | Recharts — always use for any chart/data visualization, no exceptions |
+| QR Codes | qrcode.react — always use for any QR code generation, no exceptions |
 | Database & Auth | Supabase |
 | Deployment | Vercel |
 
