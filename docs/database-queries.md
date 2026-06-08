@@ -106,18 +106,6 @@ create policy "Users can delete their own trades"
 
 ---
 
-## Indexes
-
-```sql
--- Speed up per-user trade lookups
-create index trades_user_id_idx on public.trades (user_id);
-
--- Speed up date-range filtering
-create index trades_entry_date_idx on public.trades (entry_date desc);
-```
-
----
-
 ## patches
 
 One row per batch of ~100 trades per user. Tab label = `patch_number × 100 + " Trades"`.
@@ -192,6 +180,7 @@ create policy "Users can delete their own trades"
 create index trades_user_id_idx on public.trades (user_id);
 create index trades_patch_id_idx on public.trades (patch_id);
 create index trades_patch_trade_number_idx on public.trades (patch_id, trade_number);
+create index trades_trade_date_idx on public.trades (trade_date desc);
 ```
 
 ---
@@ -199,7 +188,7 @@ create index trades_patch_trade_number_idx on public.trades (patch_id, trade_num
 ## Checklist Before Running on Production
 
 - [ ] Run `profiles` table + trigger first
-- [ ] Run `trades` table
-- [ ] Run indexes
+- [ ] Run `patches` table first (trades references patches)
+- [ ] Run `trades (redesign)` section (which drops + recreates trades with new schema)
 - [ ] Confirm RLS is enabled: Supabase → Table Editor → each table → RLS badge should show "Enabled"
 - [ ] Test with a real signup to confirm profile trigger fires
