@@ -30,6 +30,36 @@
   - Overview
   - Trades
 
+## Buttons
+
+- **Primary action** → `<Button>` (default variant, no `variant` prop needed)
+- **Secondary action** → `<Button variant="outline">`
+- Never use `ghost` for visible action buttons; reserve it for icon-only controls (theme toggle, locale switcher, etc.)
+
+## Forms
+
+**All forms use react-hook-form + yup. No exceptions.**
+
+- Define schemas in `lib/schemas/` using `yup.object()`
+- Use `yupResolver` from `@hookform/resolvers/yup`
+- Yup error messages must be translation keys (e.g. `"validation.email.required"`) so they pass through `t()`
+- Server action signatures accept plain typed objects (not `FormData`)
+- Call server actions inside `handleSubmit`; handle server errors with `setError("root", ...)`
+- Display field errors below each input; display root errors at the top of the form
+
+## i18n Rule
+
+**Every piece of visible text must use `t()` — no hardcoded strings in JSX, ever.**
+
+When adding any English text:
+1. Add the key + English value to `messages/en.json`
+2. Add the key + Arabic translation to `messages/ar.json`
+3. Use `t("key")` in the component
+
+Components that call `useTranslation()` must be `"use client"`. If a Server Component needs translated text, extract the text into a child Client Component.
+
+Server actions that return user-facing messages should return a translation key (e.g. `{ error: "auth.resetPassword.mismatch" }`), not a raw string. The client then calls `t(state.error)`.
+
 ## Tech Stack
 
 | Concern | Tool |

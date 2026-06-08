@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { LandingNavbar } from "@/components/layout/landing-navbar"
+import { LandingHero } from "@/components/landing/hero"
 
 export default async function RootPage() {
   const supabase = await createClient()
@@ -9,10 +11,10 @@ export default async function RootPage() {
 
   if (user) redirect("/overview")
 
-  // Landing page goes here — placeholder for now
   return (
-    <div className="flex min-h-svh items-center justify-center">
-      <p className="text-muted-foreground text-sm">Landing page</p>
+    <div className="flex min-h-svh flex-col">
+      <LandingNavbar />
+      <LandingHero />
     </div>
   )
 }

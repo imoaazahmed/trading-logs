@@ -1,1 +1,75 @@
-{}
+{
+  "nav": {
+    "brand": "Trading Logs",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن"
+  },
+  "sidebar": {
+    "overview": "نظرة عامة",
+    "trades": "الصفقات"
+  },
+  "userMenu": {
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "landing": {
+    "headline1": "سجّل صفقاتك.",
+    "headline2": "أتقن استراتيجيتك.",
+    "subtext": "مفكرة تداول متخصصة لتتبع أدائك ومراجعة قراراتك والنمو كمتداول.",
+    "cta": "ابدأ مجاناً",
+    "ctaSecondary": "تسجيل الدخول"
+  },
+  "auth": {
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "example@email.com",
+    "password": "كلمة المرور",
+    "login": {
+      "title": "مرحباً بعودتك",
+      "description": "سجّل دخولك إلى حسابك",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ تسجيل الدخول…",
+      "noAccount": "ليس لديك حساب؟",
+      "signupLink": "إنشاء حساب"
+    },
+    "signup": {
+      "title": "إنشاء حساب",
+      "description": "ابدأ تسجيل صفقاتك اليوم",
+      "submit": "إنشاء الحساب",
+      "submitting": "جارٍ إنشاء الحساب…",
+      "successMessage": "تحقق من بريدك الإلكتروني لتأكيد حسابك.",
+      "hasAccount": "هل لديك حساب بالفعل؟",
+      "signinLink": "تسجيل الدخول"
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة المرور",
+      "description": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+      "submit": "إرسال رابط إعادة التعيين",
+      "submitting": "جارٍ الإرسال…",
+      "successMessage": "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور.",
+      "backToSignIn": "العودة إلى تسجيل الدخول"
+    },
+    "resetPassword": {
+      "title": "تعيين كلمة مرور جديدة",
+      "description": "اختر كلمة مرور جديدة لحسابك",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "submit": "تحديث كلمة المرور",
+      "submitting": "جارٍ التحديث…"
+    }
+  },
+  "validation": {
+    "email": {
+      "required": "البريد الإلكتروني مطلوب",
+      "invalid": "يرجى إدخال بريد إلكتروني صحيح"
+    },
+    "password": {
+      "required": "كلمة المرور مطلوبة",
+      "minLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل"
+    },
+    "confirmPassword": {
+      "required": "يرجى تأكيد كلمة المرور",
+      "mismatch": "كلمتا المرور غير متطابقتين"
+    }
+  }
+}

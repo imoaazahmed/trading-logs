@@ -2,16 +2,18 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTranslation } from "react-i18next"
 import { LayoutDashboard, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const links = [
-  { href: "/overview", label: "Overview", icon: LayoutDashboard },
-  { href: "/trades", label: "Trades", icon: TrendingUp },
-]
-
 export function Sidebar() {
   const pathname = usePathname()
+  const { t } = useTranslation()
+
+  const links = [
+    { href: "/overview", label: t("sidebar.overview"), icon: LayoutDashboard },
+    { href: "/trades", label: t("sidebar.trades"), icon: TrendingUp },
+  ]
 
   return (
     <aside className="flex w-56 shrink-0 flex-col border-e">

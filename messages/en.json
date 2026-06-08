@@ -1,1 +1,75 @@
-{}
+{
+  "nav": {
+    "brand": "Trading Logs",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "trades": "Trades"
+  },
+  "userMenu": {
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "landing": {
+    "headline1": "Log your trades.",
+    "headline2": "Master your edge.",
+    "subtext": "A focused trade journal to track your performance, review your decisions, and grow as a trader.",
+    "cta": "Get started for free",
+    "ctaSecondary": "Sign in"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "login": {
+      "title": "Welcome back",
+      "description": "Sign in to your account",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Start logging your trades today",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "successMessage": "Check your email to confirm your account.",
+      "hasAccount": "Already have an account?",
+      "signinLink": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email and we'll send you a reset link",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "successMessage": "Check your email for a password reset link.",
+      "backToSignIn": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Set new password",
+      "description": "Choose a new password for your account",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Update password",
+      "submitting": "Updating…"
+    }
+  },
+  "validation": {
+    "email": {
+      "required": "Email is required",
+      "invalid": "Please enter a valid email address"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 6 characters"
+    },
+    "confirmPassword": {
+      "required": "Please confirm your password",
+      "mismatch": "Passwords do not match"
+    }
+  }
+}

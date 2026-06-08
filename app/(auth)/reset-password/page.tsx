@@ -1,7 +1,10 @@
 "use client"
 
-import { useActionState } from "react"
+import { useTranslation } from "react-i18next"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
 import { resetPassword } from "@/lib/auth/actions"
+import { resetPasswordSchema, type ResetPasswordFormValues } from "@/lib/schemas/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,45 +18,62 @@ import {
 } from "@/components/ui/card"
 
 export default function ResetPasswordPage() {
-  const [state, action, pending] = useActionState(resetPassword, null)
+  const { t } = useTranslation()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetPasswordFormValues>({ resolver: yupResolver(resetPasswordSchema) })
+
+  async function onSubmit(data: ResetPasswordFormValues) {
+    const result = await resetPassword({ password: data.password })
+    if (result?.error) {
+      setError("root", { message: result.error })
+    }
+  }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Set new password</CardTitle>
-        <CardDescription>Choose a new password for your account</CardDescription>
+        <CardTitle>{t("auth.resetPassword.title")}</CardTitle>
+        <CardDescription>{t("auth.resetPassword.description")}</CardDescription>
       </CardHeader>
-      <form action={action}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+          {errors.root && (
+            <p className="text-sm text-destructive">
+              {t(errors.root.message!, { defaultValue: errors.root.message })}
+            </p>
           )}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">New password</Label>
+            <Label htmlFor="password">{t("auth.resetPassword.newPassword")}</Label>
             <Input
               id="password"
-              name="password"
               type="password"
-              required
               autoComplete="new-password"
-              minLength={6}
+              {...register("password")}
             />
+            {errors.password && (
+              <p className="text-xs text-destructive">{t(errors.password.message!)}</p>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="confirm">Confirm password</Label>
+            <Label htmlFor="confirm">{t("auth.resetPassword.confirmPassword")}</Label>
             <Input
               id="confirm"
-              name="confirm"
               type="password"
-              required
               autoComplete="new-password"
-              minLength={6}
+              {...register("confirm")}
             />
+            {errors.confirm && (
+              <p className="text-xs text-destructive">{t(errors.confirm.message!)}</p>
+            )}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Updating…" : "Update password"}
+        <CardFooter className="mt-(--card-spacing)">
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? t("auth.resetPassword.submitting") : t("auth.resetPassword.submit")}
           </Button>
         </CardFooter>
       </form>

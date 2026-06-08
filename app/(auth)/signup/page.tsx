@@ -1,8 +1,12 @@
 "use client"
 
-import { useActionState } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useTranslation } from "react-i18next"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
 import { signup } from "@/lib/auth/actions"
+import { signupSchema, type SignupFormValues } from "@/lib/schemas/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,53 +20,74 @@ import {
 } from "@/components/ui/card"
 
 export default function SignupPage() {
-  const [state, action, pending] = useActionState(signup, null)
+  const { t } = useTranslation()
+  const [successKey, setSuccessKey] = useState<string | null>(null)
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormValues>({ resolver: yupResolver(signupSchema) })
+
+  async function onSubmit(data: SignupFormValues) {
+    const result = await signup(data)
+    if (result?.error) {
+      setError("root", { message: result.error })
+    } else if (result?.success) {
+      setSuccessKey(result.success)
+    }
+  }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>Start logging your trades today</CardDescription>
+        <CardTitle>{t("auth.signup.title")}</CardTitle>
+        <CardDescription>{t("auth.signup.description")}</CardDescription>
       </CardHeader>
-      <form action={action}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+          {errors.root && (
+            <p className="text-sm text-destructive">
+              {t(errors.root.message!, { defaultValue: errors.root.message })}
+            </p>
           )}
-          {state?.success && (
-            <p className="text-sm text-green-600">{state.success}</p>
+          {successKey && (
+            <p className="text-sm text-green-600">{t(successKey)}</p>
           )}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
-              name="email"
               type="email"
-              placeholder="you@example.com"
-              required
+              placeholder={t("auth.emailPlaceholder")}
               autoComplete="email"
+              {...register("email")}
             />
+            {errors.email && (
+              <p className="text-xs text-destructive">{t(errors.email.message!)}</p>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <Input
               id="password"
-              name="password"
               type="password"
-              required
               autoComplete="new-password"
-              minLength={6}
+              {...register("password")}
             />
+            {errors.password && (
+              <p className="text-xs text-destructive">{t(errors.password.message!)}</p>
+            )}
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Creating account…" : "Create account"}
+        <CardFooter className="flex flex-col gap-3 mt-(--card-spacing)">
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? t("auth.signup.submitting") : t("auth.signup.submit")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.signup.hasAccount")}{" "}
             <Link href="/login" className="text-foreground hover:underline">
-              Sign in
+              {t("auth.signup.signinLink")}
             </Link>
           </p>
         </CardFooter>

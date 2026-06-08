@@ -2,25 +2,29 @@
 
 import Link from "next/link"
 import { useTranslation } from "react-i18next"
-import type { User } from "@supabase/supabase-js"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
-import { UserMenu } from "@/components/layout/user-menu"
 import { LocaleSwitcher } from "@/components/locale-switcher"
+import { Button } from "@/components/ui/button"
 
-export function Navbar({ user }: { user: User }) {
+export function LandingNavbar() {
   const { t } = useTranslation()
 
   return (
-    <header className="flex h-14 shrink-0 items-center border-b px-4 gap-2">
+    <header className="flex h-14 items-center border-b px-6 gap-2">
       <Link
-        href="/overview"
+        href="/"
         className="me-auto font-heading text-sm font-semibold tracking-tight"
       >
         {t("nav.brand")}
       </Link>
       <LocaleSwitcher />
       <ThemeToggle />
-      <UserMenu user={user} />
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/login">{t("nav.signIn")}</Link>
+      </Button>
+      <Button size="sm" asChild>
+        <Link href="/signup">{t("nav.getStarted")}</Link>
+      </Button>
     </header>
   )
 }

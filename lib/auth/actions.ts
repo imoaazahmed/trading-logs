@@ -3,43 +3,27 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 
-export async function login(_: unknown, formData: FormData) {
+export async function login(data: { email: string; password: string }) {
   const supabase = await createClient()
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  })
-
+  const { error } = await supabase.auth.signInWithPassword(data)
   if (error) return { error: error.message }
-
   redirect("/overview")
 }
 
-export async function signup(_: unknown, formData: FormData) {
+export async function signup(data: { email: string; password: string }) {
   const supabase = await createClient()
-
-  const { error } = await supabase.auth.signUp({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  })
-
+  const { error } = await supabase.auth.signUp(data)
   if (error) return { error: error.message }
-
-  return { success: "Check your email to confirm your account." }
+  return { success: "auth.signup.successMessage" }
 }
 
-export async function forgotPassword(_: unknown, formData: FormData) {
+export async function forgotPassword(data: { email: string }) {
   const supabase = await createClient()
-
-  const { error } = await supabase.auth.resetPasswordForEmail(
-    formData.get("email") as string,
-    { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/reset-password` }
-  )
-
+  const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/reset-password`,
+  })
   if (error) return { error: error.message }
-
-  return { success: "Check your email for a password reset link." }
+  return { success: "auth.forgotPassword.successMessage" }
 }
 
 export async function logout() {
@@ -48,17 +32,9 @@ export async function logout() {
   redirect("/login")
 }
 
-export async function resetPassword(_: unknown, formData: FormData) {
-  const password = formData.get("password") as string
-  const confirm = formData.get("confirm") as string
-
-  if (password !== confirm) return { error: "Passwords do not match." }
-
+export async function resetPassword(data: { password: string }) {
   const supabase = await createClient()
-
-  const { error } = await supabase.auth.updateUser({ password })
-
+  const { error } = await supabase.auth.updateUser({ password: data.password })
   if (error) return { error: error.message }
-
   redirect("/overview")
 }
