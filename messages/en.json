@@ -70,7 +70,8 @@
     "goHome": "Go to homepage"
   },
   "errors": {
-    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again."
+    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again.",
+    "authCallbackFailed": "The password reset link is invalid or has expired. Please request a new one."
   },
   "footer": {
     "copyright": "© {{year}} Trading Logs. All rights reserved.",
