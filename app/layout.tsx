@@ -49,7 +49,7 @@ export default async function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <I18nProvider locale={locale} messages={messages[locale]}>
+          <I18nProvider key={locale} locale={locale} messages={messages[locale]}>
             {children}
           </I18nProvider>
         </ThemeProvider>
