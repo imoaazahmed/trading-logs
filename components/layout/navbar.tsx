@@ -13,7 +13,7 @@ export function Navbar({ user }: { user: User }) {
     <header className="flex h-14 shrink-0 items-center border-b bg-background px-4 gap-3">
       <Link
         href="/overview"
-        className="me-auto font-heading text-sm font-semibold tracking-tight"
+        className="me-auto font-heading text-base font-semibold tracking-tight"
       >
         {t("nav.brand")}
       </Link>
