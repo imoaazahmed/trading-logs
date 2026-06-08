@@ -70,6 +70,9 @@ Server actions that return user-facing messages should return a translation key 
 | Icons | Lucide |
 | i18n | react-i18next, cookie-based locale (`NEXT_LOCALE`), `en` + `ar` |
 | RTL | `dir` on `<html>` + `DirectionProvider` in `layout.tsx`; Noto Sans Arabic via `[dir="rtl"]` in `globals.css` |
+| URL State | nuqs — always use `useQueryState` / `useQueryStates` for URL search params, never roll manual `useSearchParams` + `router.push` |
+| Tables | TanStack Table (`@tanstack/react-table`) — always use for any table UI, no exceptions |
+| Charts | Recharts — always use for any chart/data visualization, no exceptions |
 | Database & Auth | Supabase |
 | Deployment | Vercel |
 

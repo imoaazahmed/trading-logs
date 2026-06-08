@@ -3,8 +3,12 @@
 import { forwardRef, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 
 const PasswordInput = forwardRef<
   HTMLInputElement,
@@ -14,23 +18,23 @@ const PasswordInput = forwardRef<
   const { t } = useTranslation()
 
   return (
-    <div className="relative">
-      <Input
+    <InputGroup className={className}>
+      <InputGroupInput
         {...props}
         ref={ref}
         type={visible ? "text" : "password"}
         placeholder={placeholder}
-        className={cn("pe-10", className)}
       />
-      <button
-        type="button"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? t("auth.hidePassword") : t("auth.showPassword")}
-        className="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
-      >
-        {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-      </button>
-    </div>
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton
+          size="icon-sm"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? t("auth.hidePassword") : t("auth.showPassword")}
+        >
+          {visible ? <EyeOff /> : <Eye />}
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   )
 })
 

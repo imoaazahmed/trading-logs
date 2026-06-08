@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { I18nProvider } from "@/components/i18n-provider"
 import { DirectionProvider } from "@/components/ui/direction"
 import { cn } from "@/lib/utils"
@@ -53,6 +54,7 @@ export default async function RootLayout({
       )}
     >
       <body>
+        <NuqsAdapter>
         <DirectionProvider dir={dir}>
           <ThemeProvider>
             <TooltipProvider>
@@ -66,6 +68,7 @@ export default async function RootLayout({
             </TooltipProvider>
           </ThemeProvider>
         </DirectionProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )
