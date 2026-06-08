@@ -82,7 +82,7 @@ type SortablePatchTabProps = {
   openEditLimit: (patch: Patch) => void
   onHidePatch: (id: string) => Promise<void>
   setDeleteTarget: (patch: Patch | null) => void
-  dragOccurred: MutableRefObject<boolean>
+  dragOccurredRef: MutableRefObject<boolean>
 }
 
 function SortablePatchTab({
@@ -93,7 +93,7 @@ function SortablePatchTab({
   openEditLimit,
   onHidePatch,
   setDeleteTarget,
-  dragOccurred,
+  dragOccurredRef,
 }: SortablePatchTabProps) {
   const { t } = useTranslation()
   const {
@@ -119,8 +119,8 @@ function SortablePatchTab({
           {...attributes}
           {...listeners}
           onClick={() => {
-            if (dragOccurred.current) {
-              dragOccurred.current = false
+            if (dragOccurredRef.current) {
+              dragOccurredRef.current = false
               return
             }
             onTabChange(patch.id)
@@ -219,7 +219,7 @@ export function PatchTabs({
     formState: { errors, isSubmitting },
   } = useForm({ resolver })
 
-  const dragOccurred = useRef(false)
+  const dragOccurredRef = useRef(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const activePatch = activeId ? (patches.find((p) => p.id === activeId) ?? null) : null
 
@@ -230,13 +230,13 @@ export function PatchTabs({
   )
 
   const handleDragStart = useCallback(({ active }: DragStartEvent) => {
-    dragOccurred.current = false
+    dragOccurredRef.current = false
     setActiveId(String(active.id))
   }, [])
 
   const handleDragEnd = useCallback(({ active, over }: DragEndEvent) => {
-    dragOccurred.current = true
-    setTimeout(() => { dragOccurred.current = false }, 0)
+    dragOccurredRef.current = true
+    setTimeout(() => { dragOccurredRef.current = false }, 0)
     setActiveId(null)
     if (!over || active.id === over.id) return
     const visible = patches.filter((p) => !p.is_hidden)
@@ -351,7 +351,7 @@ export function PatchTabs({
                 openEditLimit={openEditLimit}
                 onHidePatch={onHidePatch}
                 setDeleteTarget={setDeleteTarget}
-                dragOccurred={dragOccurred}
+                dragOccurredRef={dragOccurredRef}
               />
             ))}
           </SortableContext>
