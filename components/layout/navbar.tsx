@@ -6,7 +6,6 @@ import type { User } from "@supabase/supabase-js"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { UserMenu } from "@/components/layout/user-menu"
 import { LocaleSwitcher } from "@/components/locale-switcher"
-
 export function Navbar({ user }: { user: User }) {
   const { t } = useTranslation()
 
