@@ -3,6 +3,10 @@ export type Patch = {
   id: string
   user_id: string
   patch_number: number
+  name: string
+  patch_limit: number
+  is_hidden: boolean
+  sort_order: number
   created_at: string
 }
 

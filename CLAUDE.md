@@ -35,6 +35,7 @@
 - **Primary action** → `<Button>` (default variant, no `variant` prop needed)
 - **Secondary action** → `<Button variant="outline">`
 - Never use `ghost` for visible action buttons; reserve it for icon-only controls (theme toggle, locale switcher, etc.)
+- **Loading state** — add `<Spinner data-icon="inline-start" />` inside the button; it handles spacing automatically. Never swap the label text for "Saving…" or similar.
 
 ## Forms
 

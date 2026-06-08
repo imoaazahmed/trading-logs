@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryState } from 'nuqs'
 import { useTranslation } from 'react-i18next'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { PatchTabs } from './patch-tabs'
@@ -12,6 +13,8 @@ import { DeleteTradeDialog } from './delete-trade-dialog'
 import { enrichTrades } from '@/lib/trades/calculations'
 import {
   createPatch,
+  updatePatch,
+  deletePatch,
   getPatchTrades,
   addTrade,
   updateTrade,
@@ -38,10 +41,10 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
   const [loadingTrades, setLoadingTrades] = useState(false)
   const [drawer, setDrawer] = useState<DrawerState>({ open: false })
   const [deleteTarget, setDeleteTarget] = useState<EnrichedTrade | null>(null)
-  const [isPendingPatch, startPatchTransition] = useTransition()
 
   const activePatchId =
     patches.find((p) => p.id === patchId)?.id ??
+    patches.find((p) => !p.is_hidden)?.id ??
     patches.at(-1)?.id ??
     ''
 
@@ -54,32 +57,69 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
     })
   }, [activePatchId])
 
-  function handleTabChange(id: string) {
-    setPatchId(id)
+  // Patch handlers
+  async function handleNewPatch(name: string, patchLimit: number) {
+    const { data } = await createPatch(name, patchLimit)
+    if (data) {
+      setPatches((prev) => [...prev, data])
+      setPatchId(data.id)
+    }
   }
 
-  function handleNewPatch() {
-    startPatchTransition(async () => {
-      const { data } = await createPatch()
-      if (data) {
-        setPatches((prev) => [...prev, data])
-        setPatchId(data.id)
+  async function handleRenamePatch(id: string, name: string) {
+    const { error } = await updatePatch(id, { name })
+    if (!error) setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, name } : p)))
+  }
+
+  async function handleEditLimit(id: string, patchLimit: number) {
+    const { error } = await updatePatch(id, { patch_limit: patchLimit })
+    if (!error) setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, patch_limit: patchLimit } : p)))
+  }
+
+  async function handleDeletePatch(id: string) {
+    const { error } = await deletePatch(id)
+    if (!error) {
+      const remaining = patches.filter((p) => p.id !== id)
+      setPatches(remaining)
+      if (activePatchId === id) {
+        const next = remaining.find((p) => !p.is_hidden) ?? remaining[0]
+        if (next) setPatchId(next.id)
       }
-    })
+    }
   }
 
+  async function handleHidePatch(id: string) {
+    const { error } = await updatePatch(id, { is_hidden: true })
+    if (!error) {
+      setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: true } : p)))
+      if (activePatchId === id) {
+        const next = patches.find((p) => p.id !== id && !p.is_hidden)
+        if (next) setPatchId(next.id)
+      }
+    }
+  }
+
+  async function handleShowPatch(id: string) {
+    const { error } = await updatePatch(id, { is_hidden: false })
+    if (!error)
+      setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: false } : p)))
+  }
+
+  async function handleReorder(orderedIds: string[]) {
+    // Optimistic — local state already updated by PatchTabs
+    await Promise.all(orderedIds.map((id, index) => updatePatch(id, { sort_order: index })))
+  }
+
+  // Trade handlers
   async function handleSave(data: TradeSchema): Promise<string | null> {
     const formData = data as TradeFormData
-
     let result: { error: string | null }
     if (drawer.open && drawer.mode === 'edit') {
       result = await updateTrade(drawer.trade.id, formData)
     } else {
       result = await addTrade(activePatchId, formData)
     }
-
     if (result.error) return result.error
-
     const { data: fresh } = await getPatchTrades(activePatchId)
     setRawTrades(fresh)
     setDrawer({ open: false })
@@ -96,37 +136,43 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
   const enriched = enrichTrades(rawTrades)
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        {patches.length > 0 && (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center px-4 py-2 border-b">
+        <Button className="ms-auto" onClick={() => setDrawer({ open: true, mode: 'add' })}>
+          <Plus className="size-4" />
+          {t('trades.addTrade')}
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {loadingTrades ? (
+          <div className="flex items-center justify-center h-48 text-muted-foreground gap-2">
+            <Spinner />
+          </div>
+        ) : (
+          <TradesTable
+            trades={enriched}
+            onEdit={(trade) => setDrawer({ open: true, mode: 'edit', trade })}
+            onDelete={(trade) => setDeleteTarget(trade)}
+          />
+        )}
+      </div>
+
+      {patches.length > 0 && (
+        <div className="h-9 border-t shrink-0 bg-background">
           <PatchTabs
             patches={patches}
             activePatchId={activePatchId}
-            onTabChange={handleTabChange}
+            onTabChange={(id) => setPatchId(id)}
             onNewPatch={handleNewPatch}
-            isCreatingPatch={isPendingPatch}
+            onRenamePatch={handleRenamePatch}
+            onEditLimit={handleEditLimit}
+            onDeletePatch={handleDeletePatch}
+            onHidePatch={handleHidePatch}
+            onShowPatch={handleShowPatch}
+            onReorder={handleReorder}
           />
-        )}
-        <div className="flex items-center gap-3 ms-auto">
-          <span className="text-sm text-muted-foreground">
-            {t('trades.tradeCount', { count: enriched.length })}
-          </span>
-          <Button onClick={() => setDrawer({ open: true, mode: 'add' })}>
-            {t('trades.addTrade')}
-          </Button>
         </div>
-      </div>
-
-      {loadingTrades ? (
-        <div className="flex items-center justify-center h-48 text-muted-foreground gap-2">
-          <Spinner />
-        </div>
-      ) : (
-        <TradesTable
-          trades={enriched}
-          onEdit={(trade) => setDrawer({ open: true, mode: 'edit', trade })}
-          onDelete={(trade) => setDeleteTarget(trade)}
-        />
       )}
 
       <TradeDrawer

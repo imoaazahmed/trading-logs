@@ -145,6 +145,25 @@
     "orderType": {
       "market": "سوق",
       "limit": "محدد"
+    },
+    "patches": {
+      "newTitle": "دفعة جديدة",
+      "renameTitle": "إعادة تسمية الدفعة",
+      "nameLabel": "اسم الدفعة",
+      "patchLimitLabel": "حد الدفعة",
+      "editLimitTitle": "تعديل الحد",
+      "editLimit": "تعديل الحد",
+      "nameRequired": "اسم الدفعة مطلوب",
+      "limitRequired": "حد الدفعة مطلوب",
+      "limitInvalid": "يجب أن يكون رقماً صحيحاً",
+      "limitMin": "يجب أن يكون على الأقل 1",
+      "create": "إنشاء",
+      "rename": "إعادة التسمية",
+      "hide": "إخفاء",
+      "delete": "حذف",
+      "show": "إظهار",
+      "deleteConfirmTitle": "حذف \"{{name}}\"؟",
+      "deleteConfirmDescription": "سيؤدي هذا إلى حذف الدفعة وجميع تداولاتها بشكل دائم. لا يمكن التراجع عن هذا الإجراء."
     }
   },
   "footer": {

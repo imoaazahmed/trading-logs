@@ -49,7 +49,7 @@ export function DeleteTradeDialog({ trade, onClose, onConfirm }: Props) {
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            variant="destructive"
           >
             {t('trades.confirm')}
           </AlertDialogAction>

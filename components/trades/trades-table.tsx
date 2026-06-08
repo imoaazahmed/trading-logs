@@ -266,7 +266,7 @@ export function TradesTable({ trades, onEdit, onDelete }: Props) {
               onClick={() => onDelete(row.original)}
               aria-label={t('trades.deleteTrade')}
             >
-              <Trash2 className="size-3.5 text-red-500" />
+              <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
         ),
@@ -282,7 +282,7 @@ export function TradesTable({ trades, onEdit, onDelete }: Props) {
   })
 
   return (
-    <div className="rounded-md border bg-background overflow-auto">
+    <div className="border-b bg-background overflow-auto">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (

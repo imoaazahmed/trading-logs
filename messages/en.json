@@ -145,6 +145,25 @@
     "orderType": {
       "market": "Market",
       "limit": "Limit"
+    },
+    "patches": {
+      "newTitle": "New Patch",
+      "renameTitle": "Rename Patch",
+      "nameLabel": "Patch Name",
+      "patchLimitLabel": "Patch Limit",
+      "editLimitTitle": "Edit Limit",
+      "editLimit": "Edit Limit",
+      "nameRequired": "Patch name is required",
+      "limitRequired": "Patch limit is required",
+      "limitInvalid": "Must be a whole number",
+      "limitMin": "Must be at least 1",
+      "create": "Create",
+      "rename": "Rename",
+      "hide": "Hide",
+      "delete": "Delete",
+      "show": "Show",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirmDescription": "This will permanently delete the patch and all its trades. This action cannot be undone."
     }
   },
   "footer": {

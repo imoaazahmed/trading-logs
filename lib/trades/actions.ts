@@ -5,7 +5,10 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Patch, RawTrade, TradeFormData } from './types'
 
-export async function createPatch(): Promise<{ data: Patch | null; error: string | null }> {
+export async function createPatch(
+  name: string,
+  patchLimit: number
+): Promise<{ data: Patch | null; error: string | null }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'errors.unauthorized' }
@@ -21,13 +24,54 @@ export async function createPatch(): Promise<{ data: Patch | null; error: string
 
   const { data, error } = await supabase
     .from('patches')
-    .insert({ user_id: user.id, patch_number: nextNumber })
+    .insert({
+      user_id: user.id,
+      patch_number: nextNumber,
+      name,
+      patch_limit: patchLimit,
+      sort_order: nextNumber,
+    })
     .select()
     .single()
 
   if (error) return { data: null, error: 'errors.generic' }
   revalidatePath('/trades')
   return { data: data as Patch, error: null }
+}
+
+export async function updatePatch(
+  patchId: string,
+  updates: Partial<{ name: string; patch_limit: number; is_hidden: boolean; sort_order: number }>
+): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'errors.unauthorized' }
+
+  const { error } = await supabase
+    .from('patches')
+    .update(updates)
+    .eq('id', patchId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: 'errors.generic' }
+  revalidatePath('/trades')
+  return { error: null }
+}
+
+export async function deletePatch(patchId: string): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'errors.unauthorized' }
+
+  const { error } = await supabase
+    .from('patches')
+    .delete()
+    .eq('id', patchId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: 'errors.generic' }
+  revalidatePath('/trades')
+  return { error: null }
 }
 
 export async function getPatchTrades(
