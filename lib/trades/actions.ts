@@ -34,10 +34,14 @@ export async function getPatchTrades(
   patchId: string
 ): Promise<{ data: RawTrade[]; error: string | null }> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: [], error: 'errors.unauthorized' }
+
   const { data, error } = await supabase
     .from('trades')
     .select('*')
     .eq('patch_id', patchId)
+    .eq('user_id', user.id)
     .order('trade_number', { ascending: true })
 
   if (error) return { data: [], error: 'errors.generic' }
@@ -84,6 +88,8 @@ export async function updateTrade(
   formData: TradeFormData
 ): Promise<{ error: string | null }> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'errors.unauthorized' }
 
   const trade_time = formData.trade_time.length === 5
     ? formData.trade_time + ':00'
@@ -93,6 +99,7 @@ export async function updateTrade(
     .from('trades')
     .update({ ...formData, trade_time, updated_at: new Date().toISOString() })
     .eq('id', tradeId)
+    .eq('user_id', user.id)
 
   if (error) return { error: 'errors.generic' }
   revalidatePath('/trades')
@@ -101,7 +108,10 @@ export async function updateTrade(
 
 export async function deleteTrade(tradeId: string): Promise<{ error: string | null }> {
   const supabase = await createClient()
-  const { error } = await supabase.from('trades').delete().eq('id', tradeId)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'errors.unauthorized' }
+
+  const { error } = await supabase.from('trades').delete().eq('id', tradeId).eq('user_id', user.id)
   if (error) return { error: 'errors.generic' }
   revalidatePath('/trades')
   return { error: null }
