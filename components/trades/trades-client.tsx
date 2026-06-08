@@ -30,11 +30,11 @@ type DrawerState =
 
 type Props = {
   patches: Patch[]
-  initialPatchId: string
 }
 
-export function TradesClient({ patches: initialPatches, initialPatchId }: Props) {
-  const LAST_PATCH_KEY = 'trading-logs:last-patch'
+const LAST_PATCH_KEY = 'trading-logs:last-patch'
+
+export function TradesClient({ patches: initialPatches }: Props) {
   const { t } = useTranslation()
   const [patches, setPatches] = useState<Patch[]>(initialPatches)
   const [patchId, setPatchId] = useQueryState('patch', { defaultValue: '' })
@@ -179,7 +179,7 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
           <PatchTabs
             patches={patches}
             activePatchId={activePatchId}
-            onTabChange={(id) => setPatchId(id)}
+            onTabChange={activatePatch}
             onNewPatch={handleNewPatch}
             onRenamePatch={handleRenamePatch}
             onEditLimit={handleEditLimit}

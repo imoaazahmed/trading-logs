@@ -27,7 +27,5 @@ export default async function TradesPage() {
     if (created) patches = [created as Patch]
   }
 
-  const initialPatchId = patches.at(-1)?.id ?? ''
-
-  return <TradesClient patches={patches} initialPatchId={initialPatchId} />
+  return <TradesClient patches={patches} />
 }
