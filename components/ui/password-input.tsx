@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 const PasswordInput = forwardRef<
   HTMLInputElement,
   Omit<React.ComponentProps<"input">, "type">
->(({ className, ...props }, ref) => {
+>(({ className, placeholder = "●●●●●●●●", ...props }, ref) => {
   const [visible, setVisible] = useState(false)
   const { t } = useTranslation()
 
@@ -19,6 +19,7 @@ const PasswordInput = forwardRef<
         {...props}
         ref={ref}
         type={visible ? "text" : "password"}
+        placeholder={placeholder}
         className={cn("pe-10", className)}
       />
       <button
