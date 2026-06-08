@@ -34,6 +34,14 @@ type Props = {
 
 const LAST_PATCH_KEY = 'trading-logs:last-patch'
 
+function fallbackPatch(list: Patch[], removedId: string): string {
+  const removedIndex = list.findIndex((p) => p.id === removedId)
+  for (let i = removedIndex - 1; i >= 0; i--) {
+    if (!list[i].is_hidden && list[i].id !== removedId) return list[i].id
+  }
+  return list.find((p) => p.id !== removedId && !p.is_hidden)?.id ?? ''
+}
+
 export function TradesClient({ patches: initialPatches }: Props) {
   const { t } = useTranslation()
   const [patches, setPatches] = useState<Patch[]>(initialPatches)
@@ -95,11 +103,10 @@ export function TradesClient({ patches: initialPatches }: Props) {
   async function handleDeletePatch(id: string) {
     const { error } = await deletePatch(id)
     if (!error) {
-      const remaining = patches.filter((p) => p.id !== id)
-      setPatches(remaining)
+      setPatches((prev) => prev.filter((p) => p.id !== id))
       if (activePatchId === id) {
-        const next = remaining.find((p) => !p.is_hidden) ?? remaining[0]
-        if (next) setPatchId(next.id)
+        const next = fallbackPatch(patches, id)
+        if (next) activatePatch(next)
       }
     }
   }
@@ -109,20 +116,25 @@ export function TradesClient({ patches: initialPatches }: Props) {
     if (!error) {
       setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: true } : p)))
       if (activePatchId === id) {
-        const next = patches.find((p) => p.id !== id && !p.is_hidden)
-        if (next) setPatchId(next.id)
+        const next = fallbackPatch(patches, id)
+        if (next) activatePatch(next)
       }
     }
   }
 
   async function handleShowPatch(id: string) {
     const { error } = await updatePatch(id, { is_hidden: false })
-    if (!error)
+    if (!error) {
       setPatches((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: false } : p)))
+      activatePatch(id)
+    }
   }
 
   async function handleReorder(orderedIds: string[]) {
-    // Optimistic — local state already updated by PatchTabs
+    setPatches((prev) => {
+      const map = new Map(prev.map((p) => [p.id, p]))
+      return orderedIds.map((id) => map.get(id)).filter((p): p is Patch => !!p)
+    })
     await Promise.all(orderedIds.map((id, index) => updatePatch(id, { sort_order: index })))
   }
 
