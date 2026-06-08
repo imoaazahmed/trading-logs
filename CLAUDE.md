@@ -75,6 +75,7 @@ Server actions that return user-facing messages should return a translation key 
 | Tables | TanStack Table (`@tanstack/react-table`) — always use for any table UI, no exceptions |
 | Charts | Recharts — always use for any chart/data visualization, no exceptions |
 | QR Codes | qrcode.react — always use for any QR code generation, no exceptions |
+| Drag & Drop | @dnd-kit (`@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`) — always use for any drag-and-drop UI, no exceptions |
 | Database & Auth | Supabase |
 | Deployment | Vercel |
 

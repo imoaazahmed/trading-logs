@@ -1,6 +1,23 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import {
@@ -57,6 +74,94 @@ import {
 } from "@/lib/schemas/patch"
 import type * as yup from "yup"
 
+type SortablePatchTabProps = {
+  patch: Patch
+  activePatchId: string
+  onTabChange: (id: string) => void
+  openRename: (patch: Patch) => void
+  openEditLimit: (patch: Patch) => void
+  onHidePatch: (id: string) => Promise<void>
+  setDeleteTarget: (patch: Patch | null) => void
+}
+
+function SortablePatchTab({
+  patch,
+  activePatchId,
+  onTabChange,
+  openRename,
+  openEditLimit,
+  onHidePatch,
+  setDeleteTarget,
+}: SortablePatchTabProps) {
+  const { t } = useTranslation()
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: patch.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <button
+          ref={setNodeRef}
+          style={style}
+          {...attributes}
+          {...listeners}
+          onClick={() => onTabChange(patch.id)}
+          className={cn(
+            "flex h-full items-center justify-center border-e border-border/40 px-3",
+            "cursor-pointer text-xs font-medium whitespace-nowrap transition-colors select-none",
+            patch.id === activePatchId
+              ? "bg-muted text-foreground"
+              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+            isDragging && "opacity-0"
+          )}
+        >
+          {patch.name}
+        </button>
+      </ContextMenuTrigger>
+      <ContextMenuContent side="top">
+        <ContextMenuItem onClick={() => openRename(patch)} className="gap-2">
+          <Pencil className="size-3.5" />
+          {t("trades.patches.rename")}
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => openEditLimit(patch)}
+          className="gap-2"
+        >
+          <Hash className="size-3.5" />
+          {t("trades.patches.editLimit")}
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => onHidePatch(patch.id)}
+          className="gap-2"
+        >
+          <EyeOff className="size-3.5" />
+          {t("trades.patches.hide")}
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem
+          onClick={() => setDeleteTarget(patch)}
+          variant="destructive"
+          className="gap-2"
+        >
+          <Trash2 className="size-3.5" />
+          {t("trades.patches.delete")}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  )
+}
+
 type PatchDialog =
   | { open: false }
   | { open: true; mode: "create" }
@@ -110,8 +215,8 @@ export function PatchTabs({
   const [visibleIds, setVisibleIds] = useState<string[]>(() =>
     patches.filter((p) => !p.is_hidden).map((p) => p.id)
   )
-  const [draggedId, setDraggedId] = useState<string | null>(null)
-  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const activePatch = activeId ? (patches.find((p) => p.id === activeId) ?? null) : null
 
   // Sync when patches change externally (new patch added, hide/show)
   useEffect(() => {
@@ -128,6 +233,25 @@ export function PatchTabs({
     .filter(Boolean) as Patch[]
 
   const hiddenPatches = patches.filter((p) => p.is_hidden)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  )
+
+  const handleDragStart = useCallback(({ active }: DragStartEvent) => {
+    setActiveId(String(active.id))
+  }, [])
+
+  const handleDragEnd = useCallback(({ active, over }: DragEndEvent) => {
+    setActiveId(null)
+    if (!over || active.id === over.id) return
+    const from = visibleIds.indexOf(String(active.id))
+    const to = visibleIds.indexOf(String(over.id))
+    if (from === -1 || to === -1) return
+    const next = arrayMove(visibleIds, from, to)
+    setVisibleIds(next)
+    onReorder([...next, ...hiddenPatches.map((p) => p.id)])
+  }, [visibleIds, hiddenPatches, onReorder])
 
   function openCreate() {
     schemaRef.current = patchCreateSchema
@@ -158,38 +282,6 @@ export function PatchTabs({
     }
     setDialog({ open: false })
   })
-
-  function handleDragStart(id: string) {
-    setDraggedId(id)
-  }
-
-  function handleDragOver(e: React.DragEvent, id: string) {
-    e.preventDefault()
-    if (id !== draggedId) setDragOverId(id)
-  }
-
-  function handleDrop(targetId: string) {
-    if (!draggedId || draggedId === targetId) {
-      setDraggedId(null)
-      setDragOverId(null)
-      return
-    }
-    const next = [...visibleIds]
-    const from = next.indexOf(draggedId)
-    const to = next.indexOf(targetId)
-    if (from === -1 || to === -1) return
-    next.splice(from, 1)
-    next.splice(to, 0, draggedId)
-    setVisibleIds(next)
-    onReorder([...next, ...hiddenPatches.map((p) => p.id)])
-    setDraggedId(null)
-    setDragOverId(null)
-  }
-
-  function handleDragEnd() {
-    setDraggedId(null)
-    setDragOverId(null)
-  }
 
   return (
     <>
@@ -237,65 +329,46 @@ export function PatchTabs({
         <div className="w-px shrink-0 self-stretch bg-border" />
 
         {/* Visible tabs — vertical text, draggable left-right */}
-        {visiblePatches.map((patch) => (
-          <ContextMenu key={patch.id}>
-            <ContextMenuTrigger asChild>
+        <DndContext
+          id="patch-tabs-dnd"
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={visibleIds}
+            strategy={horizontalListSortingStrategy}
+          >
+            {visiblePatches.map((patch) => (
+              <SortablePatchTab
+                key={patch.id}
+                patch={patch}
+                activePatchId={activePatchId}
+                onTabChange={onTabChange}
+                openRename={openRename}
+                openEditLimit={openEditLimit}
+                onHidePatch={onHidePatch}
+                setDeleteTarget={setDeleteTarget}
+              />
+            ))}
+          </SortableContext>
+          <DragOverlay dropAnimation={null}>
+            {activePatch && (
               <button
-                draggable
-                onDragStart={() => handleDragStart(patch.id)}
-                onDragOver={(e) => handleDragOver(e, patch.id)}
-                onDrop={() => handleDrop(patch.id)}
-                onDragEnd={handleDragEnd}
-                onClick={() => onTabChange(patch.id)}
                 className={cn(
-                  "flex h-full items-center justify-center border-e border-border/40 px-3",
-                  "cursor-pointer text-xs font-medium whitespace-nowrap transition-colors select-none",
-                  patch.id === activePatchId
+                  "flex h-9 items-center justify-center border-e border-border/40 px-3",
+                  "cursor-grabbing text-xs font-medium whitespace-nowrap select-none shadow-md",
+                  activePatch.id === activePatchId
                     ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                  dragOverId === patch.id &&
-                    draggedId !== patch.id &&
-                    "bg-primary/10",
-                  draggedId === patch.id && "opacity-40"
+                    : "text-muted-foreground bg-muted/50"
                 )}
               >
-                {patch.name}
+                {activePatch.name}
               </button>
-            </ContextMenuTrigger>
-            <ContextMenuContent side="top">
-              <ContextMenuItem
-                onClick={() => openRename(patch)}
-                className="gap-2"
-              >
-                <Pencil className="size-3.5" />
-                {t("trades.patches.rename")}
-              </ContextMenuItem>
-              <ContextMenuItem
-                onClick={() => openEditLimit(patch)}
-                className="gap-2"
-              >
-                <Hash className="size-3.5" />
-                {t("trades.patches.editLimit")}
-              </ContextMenuItem>
-              <ContextMenuItem
-                onClick={() => onHidePatch(patch.id)}
-                className="gap-2"
-              >
-                <EyeOff className="size-3.5" />
-                {t("trades.patches.hide")}
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                onClick={() => setDeleteTarget(patch)}
-                variant="destructive"
-                className="gap-2"
-              >
-                <Trash2 className="size-3.5" />
-                {t("trades.patches.delete")}
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        ))}
+            )}
+          </DragOverlay>
+        </DndContext>
 
         {/* New patch */}
         <Button
