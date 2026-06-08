@@ -1,0 +1,16 @@
+{
+  "common": {
+    "button": "Button",
+    "close": "Close"
+  },
+  "home": {
+    "title": "Project ready!",
+    "subtitle": "You may now add components and start building.",
+    "buttonHint": "We've already added the button component for you.",
+    "darkModeHint": "Press {{key}} to toggle dark mode"
+  },
+  "drawer": {
+    "title": "Drawer",
+    "description": "This is a drawer."
+  }
+}
