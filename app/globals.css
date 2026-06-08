@@ -127,3 +127,8 @@
     @apply font-sans;
     }
 }
+
+[dir="rtl"] {
+  --font-heading: var(--font-arabic);
+  font-family: var(--font-arabic), sans-serif;
+}
