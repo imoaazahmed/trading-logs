@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, type MutableRefObject } from "react"
 import {
   DndContext,
   DragOverlay,
@@ -82,6 +82,7 @@ type SortablePatchTabProps = {
   openEditLimit: (patch: Patch) => void
   onHidePatch: (id: string) => Promise<void>
   setDeleteTarget: (patch: Patch | null) => void
+  dragOccurred: MutableRefObject<boolean>
 }
 
 function SortablePatchTab({
@@ -92,6 +93,7 @@ function SortablePatchTab({
   openEditLimit,
   onHidePatch,
   setDeleteTarget,
+  dragOccurred,
 }: SortablePatchTabProps) {
   const { t } = useTranslation()
   const {
@@ -116,7 +118,13 @@ function SortablePatchTab({
           style={style}
           {...attributes}
           {...listeners}
-          onClick={() => onTabChange(patch.id)}
+          onClick={() => {
+            if (dragOccurred.current) {
+              dragOccurred.current = false
+              return
+            }
+            onTabChange(patch.id)
+          }}
           className={cn(
             "flex h-full items-center justify-center border-e border-border/40 px-3",
             "cursor-pointer text-xs font-medium whitespace-nowrap transition-colors select-none",
@@ -211,47 +219,40 @@ export function PatchTabs({
     formState: { errors, isSubmitting },
   } = useForm({ resolver })
 
-  // Local ordering for smooth optimistic drag-and-drop
-  const [visibleIds, setVisibleIds] = useState<string[]>(() =>
-    patches.filter((p) => !p.is_hidden).map((p) => p.id)
-  )
+  const dragOccurred = useRef(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const activePatch = activeId ? (patches.find((p) => p.id === activeId) ?? null) : null
 
-  // Sync when patches change externally (new patch added, hide/show)
-  useEffect(() => {
-    setVisibleIds((prev) => {
-      const newVisible = patches.filter((p) => !p.is_hidden).map((p) => p.id)
-      const kept = prev.filter((id) => newVisible.includes(id))
-      const added = newVisible.filter((id) => !prev.includes(id))
-      return [...kept, ...added]
-    })
-  }, [patches])
-
-  const visiblePatches = visibleIds
-    .map((id) => patches.find((p) => p.id === id))
-    .filter(Boolean) as Patch[]
-
-  const hiddenPatches = patches.filter((p) => p.is_hidden)
+  const visiblePatches = patches.filter((p) => !p.is_hidden)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   )
 
   const handleDragStart = useCallback(({ active }: DragStartEvent) => {
+    dragOccurred.current = false
     setActiveId(String(active.id))
   }, [])
 
   const handleDragEnd = useCallback(({ active, over }: DragEndEvent) => {
+    dragOccurred.current = true
+    setTimeout(() => { dragOccurred.current = false }, 0)
     setActiveId(null)
     if (!over || active.id === over.id) return
+    const visible = patches.filter((p) => !p.is_hidden)
+    const visibleIds = visible.map((p) => p.id)
     const from = visibleIds.indexOf(String(active.id))
     const to = visibleIds.indexOf(String(over.id))
     if (from === -1 || to === -1) return
-    const next = arrayMove(visibleIds, from, to)
-    setVisibleIds(next)
-    onReorder([...next, ...hiddenPatches.map((p) => p.id)])
-  }, [visibleIds, hiddenPatches, onReorder])
+    const newVisibleIds = arrayMove(visibleIds, from, to)
+    // Interleave hidden patches back at their original positions
+    const allIds: string[] = []
+    let vi = 0
+    for (const p of patches) {
+      allIds.push(p.is_hidden ? p.id : newVisibleIds[vi++])
+    }
+    onReorder(allIds)
+  }, [patches, onReorder])
 
   function openCreate() {
     schemaRef.current = patchCreateSchema
@@ -337,7 +338,7 @@ export function PatchTabs({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={visibleIds}
+            items={visiblePatches.map((p) => p.id)}
             strategy={horizontalListSortingStrategy}
           >
             {visiblePatches.map((patch) => (
@@ -350,6 +351,7 @@ export function PatchTabs({
                 openEditLimit={openEditLimit}
                 onHidePatch={onHidePatch}
                 setDeleteTarget={setDeleteTarget}
+                dragOccurred={dragOccurred}
               />
             ))}
           </SortableContext>
