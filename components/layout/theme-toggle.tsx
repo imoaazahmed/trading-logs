@@ -17,8 +17,8 @@ export function ThemeToggle() {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
           aria-label={t("nav.toggleTheme")}
         >
