@@ -34,9 +34,15 @@ type Props = {
 }
 
 export function TradesClient({ patches: initialPatches, initialPatchId }: Props) {
+  const LAST_PATCH_KEY = 'trading-logs:last-patch'
   const { t } = useTranslation()
   const [patches, setPatches] = useState<Patch[]>(initialPatches)
-  const [patchId, setPatchId] = useQueryState('patch', { defaultValue: initialPatchId })
+  const [patchId, setPatchId] = useQueryState('patch', { defaultValue: '' })
+
+  function activatePatch(id: string) {
+    setPatchId(id)
+    localStorage.setItem(LAST_PATCH_KEY, id)
+  }
   const [rawTrades, setRawTrades] = useState<RawTrade[]>([])
   const [loadingTrades, setLoadingTrades] = useState(false)
   const [drawer, setDrawer] = useState<DrawerState>({ open: false })
@@ -44,9 +50,19 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
 
   const activePatchId =
     patches.find((p) => p.id === patchId)?.id ??
-    patches.find((p) => !p.is_hidden)?.id ??
-    patches.at(-1)?.id ??
+    patches.filter((p) => !p.is_hidden).at(-1)?.id ??
     ''
+
+  // Restore last active patch on mount when URL has no patch param
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (patchId) return
+    const saved = localStorage.getItem(LAST_PATCH_KEY)
+    const target =
+      (saved && patches.find((p) => p.id === saved && !p.is_hidden)?.id) ??
+      patches.filter((p) => !p.is_hidden).at(-1)?.id
+    if (target) activatePatch(target)
+  }, [])
 
   useEffect(() => {
     if (!activePatchId) return
@@ -62,7 +78,7 @@ export function TradesClient({ patches: initialPatches, initialPatchId }: Props)
     const { data } = await createPatch(name, patchLimit)
     if (data) {
       setPatches((prev) => [...prev, data])
-      setPatchId(data.id)
+      activatePatch(data.id)
     }
   }
 
