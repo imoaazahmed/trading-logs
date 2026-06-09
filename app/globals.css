@@ -132,3 +132,14 @@
   --font-heading: var(--font-arabic);
   font-family: var(--font-arabic), sans-serif;
 }
+
+/* Sidebar starts below the navbar (h-14 = 3.5rem) */
+:root {
+  --navbar-height: 3.5rem;
+}
+
+[data-slot="sidebar-container"] {
+  top: var(--navbar-height);
+  bottom: 0;
+  height: auto;
+}

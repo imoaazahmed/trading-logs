@@ -1,66 +1,16 @@
-# Database Schema
+# Database Migrations
 
-Complete SQL to run on a **fresh** database. Run sections in order.
+Incremental changes for an **existing** database. Run only the sections that haven't been applied yet.
 
-Supabase SQL editor: Dashboard → SQL Editor → New query.
-
-> For incremental changes to an existing database, see [`database-migrations.md`](database-migrations.md).
+Each migration is dated and idempotent (`if not exists` / `or replace`) where possible.
 
 ---
 
-## Notes
+## 2026-06-08 — Initial trades schema
 
-- Supabase handles `auth.users` automatically — do not create it manually.
-- All custom tables live in the `public` schema.
-- Enable **Row Level Security (RLS)** on every table immediately after creation.
-- Use `auth.uid()` in RLS policies to scope data to the logged-in user.
+### patches table
 
----
-
-## 1. profiles
-
-Extends `auth.users` with app-specific user data. Auto-created via trigger on signup.
-
-```sql
-create table public.profiles (
-  id uuid references auth.users(id) on delete cascade primary key,
-  full_name text,
-  avatar_url text,
-  created_at timestamptz default now() not null,
-  updated_at timestamptz default now() not null
-);
-
-alter table public.profiles enable row level security;
-
-create policy "Users can view their own profile"
-  on public.profiles for select using (auth.uid() = id);
-
-create policy "Users can update their own profile"
-  on public.profiles for update using (auth.uid() = id);
-
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, full_name, avatar_url)
-  values (
-    new.id,
-    new.raw_user_meta_data->>'full_name',
-    new.raw_user_meta_data->>'avatar_url'
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
-```
-
----
-
-## 2. patches
-
-One row per batch of trades per user.
+Run if `patches` does not exist yet:
 
 ```sql
 create table public.patches (
@@ -92,13 +42,29 @@ create policy "Users can delete their own patches"
 create index patches_user_id_idx on public.patches (user_id);
 ```
 
----
-
-## 3. trades
-
-One row per manually logged trade, linked to a patch.
+If `patches` already exists but is missing the new columns, run instead:
 
 ```sql
+alter table public.patches add column if not exists name text not null default 'New Patch';
+alter table public.patches add column if not exists patch_limit int not null default 100;
+alter table public.patches add column if not exists is_hidden boolean not null default false;
+alter table public.patches add column if not exists sort_order int not null default 0;
+```
+
+Also add the missing update policy if it doesn't exist:
+
+```sql
+create policy "Users can update their own patches"
+  on public.patches for update using (auth.uid() = user_id);
+```
+
+### trades table (redesign — drops old placeholder)
+
+> **Warning:** This drops the existing `trades` table. The original schema was a placeholder with no real data.
+
+```sql
+drop table if exists public.trades cascade;
+
 create table public.trades (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
@@ -142,10 +108,10 @@ create index trades_trade_date_idx on public.trades (trade_date desc);
 
 ---
 
-## Checklist
+## 2026-06-08 — Rename max_trades to patch_limit
 
-- [ ] Run `profiles` table + trigger first
-- [ ] Run `patches` table second (trades references patches)
-- [ ] Run `trades` table third
-- [ ] Confirm RLS is enabled: Table Editor → each table → RLS badge shows "Enabled"
-- [ ] Test with a real signup to confirm the profile trigger fires
+Run if the `patches` column is still named `max_trades`:
+
+```sql
+alter table public.patches rename column max_trades to patch_limit;
+```

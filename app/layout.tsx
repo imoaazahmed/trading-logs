@@ -45,7 +45,7 @@ export default async function RootLayout({
       dir={dir}
       suppressHydrationWarning
       className={cn(
-        "antialiased",
+        "antialiased overscroll-none",
         fontMono.variable,
         "font-sans",
         inter.variable,
