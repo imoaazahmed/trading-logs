@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, useImperativeHandle, forwardRef, type MutableRefObject } from "react"
+import { useState, useCallback, useRef, useEffect, useImperativeHandle, forwardRef, type MutableRefObject } from "react"
 import {
   DndContext,
   DragOverlay,
@@ -23,6 +23,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import {
   Check,
   Eye,
+  Copy,
   EyeOff,
   Hash,
   Menu,
@@ -66,6 +67,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import type { Patch } from "@/lib/trades/types"
 import {
@@ -78,9 +80,12 @@ import type * as yup from "yup"
 type SortablePatchTabProps = {
   patch: Patch
   activePatchId: string
+  isLast: boolean
+  addButtonRef: MutableRefObject<HTMLButtonElement | null>
   onTabChange: (id: string) => void
   openRename: (patch: Patch) => void
   openEditLimit: (patch: Patch) => void
+  onDuplicatePatch: (id: string) => Promise<void>
   onHidePatch: (id: string) => Promise<void>
   setDeleteTarget: (patch: Patch | null) => void
   dragOccurredRef: MutableRefObject<boolean>
@@ -89,9 +94,12 @@ type SortablePatchTabProps = {
 function SortablePatchTab({
   patch,
   activePatchId,
+  isLast,
+  addButtonRef,
   onTabChange,
   openRename,
   openEditLimit,
+  onDuplicatePatch,
   onHidePatch,
   setDeleteTarget,
   dragOccurredRef,
@@ -106,6 +114,21 @@ function SortablePatchTab({
     isDragging,
   } = useSortable({ id: patch.id })
 
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const combinedRef = useCallback(
+    (node: HTMLButtonElement | null) => {
+      setNodeRef(node)
+      ;(buttonRef as MutableRefObject<HTMLButtonElement | null>).current = node
+    },
+    [setNodeRef]
+  )
+
+  useEffect(() => {
+    if (patch.id !== activePatchId) return
+    const target = isLast ? addButtonRef.current : buttonRef.current
+    target?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" })
+  }, [patch.id, activePatchId, isLast, addButtonRef])
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -115,7 +138,7 @@ function SortablePatchTab({
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <button
-          ref={setNodeRef}
+          ref={combinedRef}
           style={style}
           {...attributes}
           {...listeners}
@@ -151,6 +174,13 @@ function SortablePatchTab({
           {t("trades.patches.editLimit")}
         </ContextMenuItem>
         <ContextMenuItem
+          onClick={() => onDuplicatePatch(patch.id)}
+          className="gap-2"
+        >
+          <Copy className="size-3.5" />
+          {t("trades.patches.duplicate")}
+        </ContextMenuItem>
+        <ContextMenuItem
           onClick={() => onHidePatch(patch.id)}
           className="gap-2"
         >
@@ -184,6 +214,7 @@ type Props = {
   onNewPatch: (name: string, patchLimit: number) => Promise<void>
   onRenamePatch: (id: string, name: string) => Promise<void>
   onEditLimit: (id: string, patchLimit: number) => Promise<void>
+  onDuplicatePatch: (id: string) => Promise<void>
   onDeletePatch: (id: string) => Promise<void>
   onHidePatch: (id: string) => Promise<void>
   onShowPatch: (id: string) => Promise<void>
@@ -201,6 +232,7 @@ export const PatchTabs = forwardRef<PatchTabsHandle, Props>(function PatchTabs({
   onNewPatch,
   onRenamePatch,
   onEditLimit,
+  onDuplicatePatch,
   onDeletePatch,
   onHidePatch,
   onShowPatch,
@@ -225,6 +257,7 @@ export const PatchTabs = forwardRef<PatchTabsHandle, Props>(function PatchTabs({
   } = useForm({ resolver })
 
   const dragOccurredRef = useRef(false)
+  const addButtonRef = useRef<HTMLButtonElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const activePatch = activeId ? (patches.find((p) => p.id === activeId) ?? null) : null
 
@@ -293,8 +326,8 @@ export const PatchTabs = forwardRef<PatchTabsHandle, Props>(function PatchTabs({
 
   return (
     <>
-      <div className="flex h-full items-stretch">
-        {/* All-patches menu */}
+      <div className="flex h-full items-stretch overflow-hidden">
+        {/* Fixed: all-patches menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -341,58 +374,74 @@ export const PatchTabs = forwardRef<PatchTabsHandle, Props>(function PatchTabs({
 
         <div className="w-px shrink-0 self-stretch bg-border" />
 
-        {/* Visible tabs — vertical text, draggable left-right */}
-        <DndContext
-          id="patch-tabs-dnd"
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={visiblePatches.map((p) => p.id)}
-            strategy={horizontalListSortingStrategy}
-          >
-            {visiblePatches.map((patch) => (
-              <SortablePatchTab
-                key={patch.id}
-                patch={patch}
-                activePatchId={activePatchId}
-                onTabChange={onTabChange}
-                openRename={openRename}
-                openEditLimit={openEditLimit}
-                onHidePatch={onHidePatch}
-                setDeleteTarget={setDeleteTarget}
-                dragOccurredRef={dragOccurredRef}
-              />
-            ))}
-          </SortableContext>
-          <DragOverlay dropAnimation={null}>
-            {activePatch && (
-              <button
-                className={cn(
-                  "flex h-9 items-center justify-center border-e border-border/40 px-3",
-                  "cursor-grabbing text-xs font-medium whitespace-nowrap select-none shadow-md",
-                  activePatch.id === activePatchId
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground bg-muted/50"
-                )}
+        {/* Scrollable: tabs + add button */}
+        <ScrollAreaPrimitive.Root className="flex-1 overflow-hidden">
+          <ScrollAreaPrimitive.Viewport className="h-full w-full">
+            <div className="flex h-9 w-max items-stretch">
+              <DndContext
+                id="patch-tabs-dnd"
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
               >
-                {activePatch.name}
-              </button>
-            )}
-          </DragOverlay>
-        </DndContext>
+                <SortableContext
+                  items={visiblePatches.map((p) => p.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {visiblePatches.map((patch, i) => (
+                    <SortablePatchTab
+                      key={patch.id}
+                      patch={patch}
+                      activePatchId={activePatchId}
+                      isLast={i === visiblePatches.length - 1}
+                      addButtonRef={addButtonRef}
+                      onTabChange={onTabChange}
+                      openRename={openRename}
+                      openEditLimit={openEditLimit}
+                      onDuplicatePatch={onDuplicatePatch}
+                      onHidePatch={onHidePatch}
+                      setDeleteTarget={setDeleteTarget}
+                      dragOccurredRef={dragOccurredRef}
+                    />
+                  ))}
+                </SortableContext>
+                <DragOverlay dropAnimation={null}>
+                  {activePatch && (
+                    <button
+                      className={cn(
+                        "flex h-9 items-center justify-center border-e border-border/40 px-3",
+                        "cursor-grabbing text-xs font-medium whitespace-nowrap select-none shadow-md",
+                        activePatch.id === activePatchId
+                          ? "bg-muted text-foreground"
+                          : "text-muted-foreground bg-muted/50"
+                      )}
+                    >
+                      {activePatch.name}
+                    </button>
+                  )}
+                </DragOverlay>
+              </DndContext>
 
-        {/* New patch */}
-        <Button
-          variant="ghost"
-          onClick={openCreate}
-          aria-label={t("trades.newPatch")}
-          className="h-full w-9 shrink-0 rounded-none border-e border-border/40 p-0"
-        >
-          <Plus className="size-4" />
-        </Button>
+              {/* New patch */}
+              <Button
+                ref={addButtonRef}
+                variant="ghost"
+                onClick={openCreate}
+                aria-label={t("trades.newPatch")}
+                className="h-full w-9 shrink-0 rounded-none border-e border-border/40 p-0"
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+          </ScrollAreaPrimitive.Viewport>
+          <ScrollAreaPrimitive.Scrollbar
+            orientation="horizontal"
+            className="flex h-1.5 touch-none flex-col border-t border-t-transparent p-px transition-colors select-none"
+          >
+            <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-none bg-border" />
+          </ScrollAreaPrimitive.Scrollbar>
+        </ScrollAreaPrimitive.Root>
       </div>
 
       {/* Delete confirmation */}

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { ChartCandlestick, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { PatchTabs, type PatchTabsHandle } from "./patch-tabs"
 import { TradesTable } from "./trades-table"
 import {
@@ -23,6 +24,7 @@ import {
   createPatch,
   updatePatch,
   deletePatch,
+  duplicatePatch,
   getPatchTrades,
   addTrade,
   updateTrade,
@@ -135,6 +137,14 @@ export function TradesClient({ patches: initialPatches }: Props) {
       )
   }
 
+  async function handleDuplicatePatch(id: string) {
+    const { data } = await duplicatePatch(id)
+    if (data) {
+      setPatches((prev) => [...prev, data])
+      activatePatch(data.id)
+    }
+  }
+
   async function handleDeletePatch(id: string) {
     const { error } = await deletePatch(id)
     if (!error) {
@@ -216,7 +226,7 @@ export function TradesClient({ patches: initialPatches }: Props) {
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
+      <ScrollArea className="flex-1">
         {noPatches || allHidden ? (
           <div className="flex h-full items-center justify-center">
             <Empty>
@@ -257,7 +267,7 @@ export function TradesClient({ patches: initialPatches }: Props) {
             onDelete={(trade) => setDeleteTarget(trade)}
           />
         )}
-      </div>
+      </ScrollArea>
 
       <div className="h-9 shrink-0 border-t bg-background">
         <PatchTabs
@@ -268,6 +278,7 @@ export function TradesClient({ patches: initialPatches }: Props) {
           onNewPatch={handleNewPatch}
           onRenamePatch={handleRenamePatch}
           onEditLimit={handleEditLimit}
+          onDuplicatePatch={handleDuplicatePatch}
           onDeletePatch={handleDeletePatch}
           onHidePatch={handleHidePatch}
           onShowPatch={handleShowPatch}

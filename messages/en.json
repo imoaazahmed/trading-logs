@@ -159,6 +159,7 @@
       "limitMin": "Must be at least 1",
       "create": "Create",
       "rename": "Rename",
+      "duplicate": "Duplicate",
       "hide": "Hide",
       "delete": "Delete",
       "show": "Show",
