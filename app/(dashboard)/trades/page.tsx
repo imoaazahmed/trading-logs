@@ -16,16 +16,7 @@ export default async function TradesPage() {
     .eq('user_id', user.id)
     .order('sort_order', { ascending: true })
 
-  let patches: Patch[] = (rows ?? []) as Patch[]
-
-  if (patches.length === 0) {
-    const { data: created } = await supabase
-      .from('patches')
-      .insert({ user_id: user.id, patch_number: 1, name: 'New Patch', patch_limit: 100, sort_order: 1 })
-      .select()
-      .single()
-    if (created) patches = [created as Patch]
-  }
+  const patches: Patch[] = (rows ?? []) as Patch[]
 
   return <TradesClient patches={patches} />
 }

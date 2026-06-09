@@ -163,7 +163,12 @@
       "delete": "Delete",
       "show": "Show",
       "deleteConfirmTitle": "Delete \"{{name}}\"?",
-      "deleteConfirmDescription": "This will permanently delete the patch and all its trades. This action cannot be undone."
+      "deleteConfirmDescription": "This will permanently delete the patch and all its trades. This action cannot be undone.",
+      "emptyTitle": "No patches yet",
+      "emptyBody": "Create a patch to start logging your trades.",
+      "allHiddenTitle": "All patches are hidden",
+      "allHiddenBody": "Unhide a patch from the menu below, or create a new one.",
+      "createPatch": "Create Patch"
     }
   },
   "footer": {

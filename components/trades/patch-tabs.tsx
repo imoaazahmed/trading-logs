@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, type MutableRefObject } from "react"
+import { useState, useCallback, useRef, useImperativeHandle, forwardRef, type MutableRefObject } from "react"
 import {
   DndContext,
   DragOverlay,
@@ -35,6 +35,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -189,7 +190,11 @@ type Props = {
   onReorder: (orderedIds: string[]) => Promise<void>
 }
 
-export function PatchTabs({
+export type PatchTabsHandle = {
+  openCreate: () => void
+}
+
+export const PatchTabs = forwardRef<PatchTabsHandle, Props>(function PatchTabs({
   patches,
   activePatchId,
   onTabChange,
@@ -200,7 +205,7 @@ export function PatchTabs({
   onHidePatch,
   onShowPatch,
   onReorder,
-}: Props) {
+}, ref) {
   const { t } = useTranslation()
   const [dialog, setDialog] = useState<PatchDialog>({ open: false })
   const [deleteTarget, setDeleteTarget] = useState<Patch | null>(null)
@@ -260,6 +265,8 @@ export function PatchTabs({
     setDialog({ open: true, mode: "create" })
   }
 
+  useImperativeHandle(ref, () => ({ openCreate }), [])
+
   function openRename(patch: Patch) {
     schemaRef.current = patchNameSchema
     reset({ name: patch.name })
@@ -298,6 +305,11 @@ export function PatchTabs({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="top">
+            {patches.length === 0 && (
+              <DropdownMenuLabel className="text-muted-foreground font-normal">
+                {t("trades.patches.emptyTitle")}
+              </DropdownMenuLabel>
+            )}
             {patches.map((patch) => (
               <DropdownMenuItem
                 key={patch.id}
@@ -508,4 +520,4 @@ export function PatchTabs({
       </Dialog>
     </>
   )
-}
+})

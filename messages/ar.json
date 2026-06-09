@@ -80,7 +80,7 @@
   },
   "trades": {
     "title": "التداولات",
-    "addTrade": "إضافة تداول",
+    "addTrade": "إضافة صفقة",
     "editTrade": "تعديل التداول",
     "deleteTrade": "حذف التداول",
     "deleteConfirmTitle": "حذف التداول #{{number}}؟",
@@ -163,7 +163,12 @@
       "delete": "حذف",
       "show": "إظهار",
       "deleteConfirmTitle": "حذف \"{{name}}\"؟",
-      "deleteConfirmDescription": "سيؤدي هذا إلى حذف الدفعة وجميع تداولاتها بشكل دائم. لا يمكن التراجع عن هذا الإجراء."
+      "deleteConfirmDescription": "سيؤدي هذا إلى حذف الدفعة وجميع تداولاتها بشكل دائم. لا يمكن التراجع عن هذا الإجراء.",
+      "emptyTitle": "لا توجد دفعات بعد",
+      "emptyBody": "أنشئ دفعة لبدء تسجيل صفقاتك.",
+      "allHiddenTitle": "جميع الدفعات مخفية",
+      "allHiddenBody": "أظهر دفعة من القائمة أدناه، أو أنشئ دفعة جديدة.",
+      "createPatch": "إنشاء دفعة"
     }
   },
   "footer": {
